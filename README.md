@@ -24,7 +24,7 @@ $ ./ordenar.sh <metodo_de_ordenacao> <arquivo_de_entrada> <arquivo_de_saida>
   - Parâmetro não obrigatório
   - Arquivo de saída: onde será escrito o resultado do experimento.
   - Valor default: output.txt
-  - Formato de saída de cada resultado do experimento: <METODO> <TEMPO DECORRIDO> <WORKLOAD>
+  - Formato de saída: <algoritmo_ordenacao>, <tempo_decorrido>, <arquivo_de_entrada>
 
 
 Exemplos de execução:
