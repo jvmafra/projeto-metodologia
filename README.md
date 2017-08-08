@@ -1,9 +1,12 @@
 "# projeto-metodologia" 
 
-Para executar o script ordenar, executar os seguintes comandos:
+Antes da primeira execução é preciso dar permissão de executar o arquivo:
 
 $ chmod +x ordenar.sh
-$ ./ordenar.sh <metodo_de_ordenacao> <input> <output>
+
+Para executar o script:
+
+$ ./ordenar.sh <metodo_de_ordenacao> <arquivo_de_entrada> <arquivo_de_saida>
 
 
 - MÉTODO DE ORDENAÇÃO:
@@ -12,12 +15,12 @@ $ ./ordenar.sh <metodo_de_ordenacao> <input> <output>
   - Qualquer outro valor lançará um erro
 
 
-- INPUT
+- ARQUIVO DE ENTRADA
   - Parâmetro não obrigatório
   - Arquivo de entrada: conjunto de dados a ser ordenado
   - Valor default: input.txt (Conjunto de 10 números inteiros que está no diretorio raiz)
 
-- OUTPUT
+- ARQUIVO DE SAÍDA
   - Parâmetro não obrigatório
   - Arquivo de saída: onde será escrito o resultado do experimento.
   - Valor default: output.txt
