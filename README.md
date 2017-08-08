@@ -1,4 +1,6 @@
-"# projeto-metodologia" 
+# projeto-metodologia
+
+## Instruções de uso
 
 Antes da primeira execução é preciso dar permissão de executar o arquivo:
 
