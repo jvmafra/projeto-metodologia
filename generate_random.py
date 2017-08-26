@@ -4,20 +4,23 @@ def main():
 
     print('Iniciando processo...')
 
-    outfile = open('input_random.txt', 'a+')
+    outfile = open('random_r100.txt', 'a+')
     
     # numero de interacoes
     n = 1000000
 
     # range dos numeros
-    maximo = 1000000
+    maximo = 100
 
     for count in range(n):    
-	    num = random.randint(1, maximo)
+	    num = random.randint(0, maximo)
 	    outfile.write(str(num) + ' ')
 
     outfile.close()
-    print('Dados escritos em input_random.txt')
+    print('Dados escritos em random_r100.txt')
 
 #Call main
 main()
+
+
+
