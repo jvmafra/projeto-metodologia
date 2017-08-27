@@ -73,7 +73,7 @@ public class Main {
         long inicio = System.currentTimeMillis();
         mSorting.sort(arrayToSort);
         long fim = System.currentTimeMillis();
-        System.out.println(Arrays.toString(arrayToSort));
+        //System.out.println(Arrays.toString(arrayToSort));
         System.out.println("Finalizando ordenacao...");
         long duracao = fim - inicio;
         System.out.println("Tempo decorrido: " + duracao + "ms");
