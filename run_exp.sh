@@ -1,5 +1,4 @@
-datasets=( "random_r1000000.txt"  "random_r100.txt" "inv_r1000000.txt"  "inv_r100.txt"
-          "almOrd_r1000000.txt"  "almOrd_r100.txt")
+datasets=( "almOrd_r1000000.txt"  "almOrd_r100.txt")
 
 algo=( "quick" "merge" "insertion")
 
@@ -13,7 +12,7 @@ do
     do
         echo -e Algoritmo: "${algo[$i]}" "\n"
 
-        for j in `seq 0 5` # numero de datasets - 1
+        for j in `seq 0 1` # numero de datasets - 1
         do
             echo "--------------------------"
             echo Dataset: "${datasets[$j]}"

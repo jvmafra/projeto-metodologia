@@ -20,8 +20,8 @@ def main():
     list_numbers.sort()
 
     for i in range(int(n * 0.025)):
-        a = random.randint(0, n)
-        b = random.randint(0, n)
+        a = random.randint(1, n)
+        b = a - 1
         list_numbers[b], list_numbers[a] = list_numbers[a], list_numbers[b]
 
     for i in range(n):
