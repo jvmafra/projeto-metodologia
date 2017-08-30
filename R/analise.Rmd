@@ -1,0 +1,215 @@
+---
+title: "Análise dos resultados"
+author: "Gileade e João Victor"
+date: "28 de agosto de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align="center")
+```
+
+```{r pacotes}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(broom)
+theme_set(theme_bw())
+options(scipen = 999)
+```
+
+## Introdução
+
+```{r leitura dos dados}
+experimento <- read_csv("exec_comp_micros.txt", col_names = FALSE) %>%
+  rename("algoritmo" = X1, "tempo" = X2, "dataset" = X3) %>%
+  mutate(dataset = str_sub(dataset, 10)) %>%
+  mutate(range = as.numeric(str_extract(dataset, "[0-9]+"))) %>%
+  mutate(dataset = str_extract(dataset, "[aA-zZ]+")) %>%
+  mutate(dataset = gsub("_r","", dataset)) %>%
+  select(algoritmo, dataset, range, tempo)
+```
+
+Considerando todos os dados.
+
+```{r}
+experimento %>%
+  ggplot(aes(x = dataset, y = tempo, color = as.factor(range))) +
+  geom_jitter(alpha = .5) +
+  facet_grid(. ~ algoritmo) +
+  labs(x = "Conjunto de dados", y = "Tempo (microssegundos)", color = "Range")
+```
+
+Percebemos que não podemos observar os valores quando o algoritmo é o merge e o quick, pois o insertion apresenta altos valores quando o dataset é invertido ou random.
+
+Considerando apenas os valores abaixo de 200000000 microssegundos, podemos observar que o insetion é mais rápido que o merge e o quick.
+```{r}
+experimento %>%
+  filter(tempo < 200000000) %>%
+  ggplot(aes(x = dataset, y = tempo, color = as.factor(range))) +
+  geom_jitter(alpha = .4) +
+  facet_grid(. ~ algoritmo) +
+  labs(x = "Conjunto de dados", y = "Tempo (microssegundos)", color = "Range")
+```
+
+```{r}
+experimento %>%
+  filter(tempo < 200000000) %>%
+  ggplot(aes(x = dataset, y = tempo, color = as.factor(range))) +
+  geom_jitter(alpha = .4) +
+  geom_boxplot(outlier.shape = "") +
+  facet_grid(. ~ algoritmo) +
+  labs(x = "Conjunto de dados", y = "Tempo (microssegundos)", color = "Range")
+```
+
+Agora vendo os dados de forma sumarizada utilizando o boxplot.
+
+```{r}
+experimento %>%
+  ggplot(aes(x = algoritmo, y = tempo, color = algoritmo)) +
+  geom_boxplot() +
+  facet_wrap(~ dataset, scales = "free")
+```
+
+```{r}
+experimento %>%
+  ggplot(aes(x = tempo)) +
+  geom_histogram() + 
+  labs(x = "Tempo (microssegundos)", y = "Número de ocorrências")
+  
+```
+
+```{r}
+experimento %>%
+  #filter(algoritmo != "insertion") %>%
+  ggplot(aes(x = algoritmo, y = tempo, color= algoritmo)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_y_log10() +
+  facet_wrap(~ range) +
+  labs(x = "", y = "Tempo em microssegundos (log)")
+```
+
+```{r}
+experimento %>%
+  ggplot(aes(x = algoritmo, y = tempo, color= algoritmo)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_y_log10() +
+  facet_wrap(~ dataset) +
+  labs(x = "", y = "Tempo em microssegundos (log)") 
+```
+
+```{r}
+experimento %>%
+  ggplot(aes(x = algoritmo, y = tempo, color= algoritmo)) +
+  geom_boxplot(show.legend = FALSE) +
+  scale_y_log10() +
+  labs(x = "", y = "Tempo em microssegundos (log)")
+```
+
+## Modelo geral - Design fatorial completo
+
+```{r}
+experimento <- experimento %>%
+  mutate(algoritmo = as.factor(algoritmo)) %>%
+  mutate(dataset = as.factor(dataset)) %>%
+  mutate(range = as.factor(range))
+```
+
+```{r}
+fit <- aov(tempo ~ algoritmo * dataset * range, data=experimento)
+```
+
+```{r}
+anova(fit)
+```
+
+```{r}
+ss <- tidy(anova(fit))
+```
+
+```{r}
+## Obtendo alocação da variação a partir da soma dos quadrados
+
+soma <- sum(ss$sumsq)
+
+ss <- ss %>%
+  mutate(sumsq = sumsq/soma)
+```
+
+```{r}
+ss %>% select(term, df, sumsq)
+```
+
+```{r}
+## Coeficientes do modelo
+fit$coefficients
+```
+
+```{r}
+## Visualizando o modelo
+plot(fit)
+```
+
+```{r}
+histograma = residuals(fit)
+
+hist(histograma, main="Histogram of residuals")
+```
+
+```{r}
+df <- experimento %>%
+  mutate(pred = predict(fit)) %>%
+  mutate(res = residuals(fit))
+
+df %>%
+  ggplot(aes(x = tempo, y = res)) +
+  geom_jitter(alpha = .4) +
+  scale_x_log10()
+```
+
+## Modelo considerando os fatores mais importantes
+
+```{r}
+experimento2 <- read_csv("output.txt", col_names = FALSE) %>%
+  rename("algoritmo" = X1, "tempo" = X2, "dataset" = X3) %>%
+  mutate(dataset = str_sub(dataset, 10)) %>%
+  mutate(range = as.numeric(str_extract(dataset, "[0-9]+"))) %>%
+  mutate(dataset = str_extract(dataset, "[aA-zZ]+")) %>%
+  mutate(dataset = gsub("_r","", dataset)) %>%
+  select(algoritmo, dataset, range, tempo)
+
+
+experimento2 <- experimento2 %>% select(1,2,4)
+
+experimento2 <- experimento2 %>%
+  mutate(algoritmo = as.factor(algoritmo)) %>%
+  mutate(dataset = as.factor(dataset))
+
+
+fit2 <- aov(tempo ~ algoritmo * dataset, data=experimento2)
+
+anova(fit2)
+
+coef(fit2)
+residuos2 <- residuals(fit2)
+
+hist(residuos2,main="Histograma dos resíduos")
+qqnorm(residuos2, main="Q-Q Plot dos resíduos")
+boxplot(residuos2, main="Boxplot dos resíduos")
+lag.plot(residuos2, main="Lag plot dos resíduos")
+```
+
+```{r}
+## Teste de Tukey
+tuk<- TukeyHSD(fit2)
+tuk
+```
+
+```{r}
+plot(tuk)
+```
+```
+
+
+
